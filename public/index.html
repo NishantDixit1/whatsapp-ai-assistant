@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f172a;
+      --ink2: #1e293b;
+      --muted: #64748b;
+      --line: #e6eaf0;
+      --soft: #f7f9fc;
+      --white: #ffffff;
+      --indigo: #4f46e5;
+      --cyan: #06b6d4;
+      --grad: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      --wa: #25d366;
+      --shadow: 0 16px 48px rgba(15, 23, 42, 0.10);
+      --shadow-sm: 0 6px 24px rgba(15, 23, 42, 0.07);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      font-weight: 600; font-size: 15px; padding: 14px 24px; cursor: pointer;
+      border: 1px solid transparent; transition: transform .08s ease, box-shadow .18s ease, filter .18s ease, background .18s ease, color .18s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-grad { background: var(--grad); color: #fff; box-shadow: var(--shadow-sm); }
+    .btn-grad:hover { filter: brightness(1.06); box-shadow: var(--shadow); }
+    .btn-grad .dot, .btn-dark .dot { width: 8px; height: 8px; background: var(--wa); }
+    .btn-dark { background: var(--ink); color: #fff; }
+    .btn-dark:hover { background: var(--ink2); }
+    .btn-line { background: #fff; color: var(--ink); border-color: var(--line); }
+    .btn-line:hover { border-color: var(--indigo); color: var(--indigo); }
+    .btn-white { background: #fff; color: var(--indigo); }
+    .btn-white:hover { filter: brightness(0.97); }
+    .btn-white .dot { width: 8px; height: 8px; background: var(--wa); }
+
+    .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+      background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* HEADER */
+    header { position: sticky; top: 0; z-index: 30; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+    header .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .logo { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 18px; letter-spacing: -0.4px; }
+    .logo .mark { width: 32px; height: 32px; background: var(--grad); color: #fff; display: grid; place-items: center; font-size: 15px; }
+    .nav { display: flex; align-items: center; gap: 30px; }
+    .nav .link { font-size: 15px; font-weight: 500; color: var(--ink2); }
+    .nav .link:hover { color: var(--indigo); }
+
+    /* HERO */
+    .hero { background: radial-gradient(1100px 460px at 82% -12%, rgba(79,70,229,0.10), transparent 70%), radial-gradient(900px 420px at 15% 0%, rgba(6,182,212,0.08), transparent 70%), #fff; border-bottom: 1px solid var(--line); }
+    .hero .wrap { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 60px; align-items: center; padding: 92px 28px 84px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow-sm); padding: 7px 14px; font-size: 13px; font-weight: 600; color: var(--ink2); }
+    .pill .live { width: 8px; height: 8px; background: var(--wa); }
+    h1 { font-size: 58px; line-height: 1.04; letter-spacing: -1.8px; font-weight: 800; margin: 22px 0 20px; }
+    h1 .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .sub { font-size: 19px; color: var(--muted); max-width: 520px; }
+    .hero-cta { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+    .hero-meta { display: flex; gap: 40px; margin-top: 40px; }
+    .hero-meta b { display: block; font-size: 30px; font-weight: 800; letter-spacing: -1px; }
+    .hero-meta span { font-size: 14px; color: var(--muted); }
+
+    /* PRODUCT CARD (chat) */
+    .chat { width: 100%; max-width: 380px; justify-self: center; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .chat-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .chat-head .who { display: flex; align-items: center; gap: 11px; }
+    .chat-head .av { width: 38px; height: 38px; background: var(--grad); color: #fff; display: grid; place-items: center; font-size: 16px; }
+    .chat-head .nm { font-weight: 700; font-size: 15px; }
+    .chat-head .st { font-size: 12px; color: #16a34a; display: flex; align-items: center; gap: 5px; }
+    .chat-head .st::before { content: ""; width: 7px; height: 7px; background: #16a34a; display: inline-block; }
+    .chat-head .brand-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: var(--muted); }
+    .chat-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; background: var(--soft); }
+    .b { max-width: 82%; padding: 10px 13px; font-size: 14px; line-height: 1.45; }
+    .b.them { align-self: flex-start; background: #fff; border: 1px solid var(--line); }
+    .b.me { align-self: flex-end; background: var(--ink); color: #fff; }
+    .b .t { font-size: 10px; opacity: 0.55; text-align: right; margin-top: 3px; }
+    .conf { align-self: flex-start; max-width: 88%; background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--indigo); box-shadow: var(--shadow-sm); }
+    .conf .hd { font-weight: 700; font-size: 13px; padding: 10px 13px 6px; color: var(--indigo); }
+    .conf .ln { padding: 2px 13px; font-size: 13.5px; color: var(--ink2); }
+    .conf .ln:last-child { padding-bottom: 11px; }
+
+    /* TRUST STRIP */
+    .trust { background: var(--soft); border-bottom: 1px solid var(--line); }
+    .trust .wrap { display: flex; align-items: center; justify-content: center; gap: 40px; padding: 24px 28px; flex-wrap: wrap; }
+    .trust .lbl { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .trust .it { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 16px; color: var(--ink2); }
+    .trust .it .ic { font-size: 20px; }
+
+    /* SECTIONS */
+    section.block { padding: 90px 0; }
+    section.alt { background: var(--soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .head { max-width: 680px; }
+    .head.center { margin: 0 auto; text-align: center; }
+    .head h2 { font-size: 42px; letter-spacing: -1.2px; font-weight: 800; margin: 12px 0 14px; }
+    .head p { color: var(--muted); font-size: 18px; }
+
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 50px; }
+    .card { background: #fff; border: 1px solid var(--line); padding: 28px; box-shadow: var(--shadow-sm); transition: transform .16s ease, box-shadow .16s ease; }
+    .card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+    .card .ic { width: 50px; height: 50px; background: linear-gradient(135deg, rgba(79,70,229,0.12), rgba(6,182,212,0.12)); display: grid; place-items: center; font-size: 24px; }
+    .card .step { float: right; font-size: 13px; font-weight: 800; color: #cbd5e1; }
+    .card h3 { font-size: 19px; margin: 18px 0 8px; font-weight: 700; }
+    .card p { color: var(--muted); font-size: 15px; }
+
+    .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 50px; }
+    .why { display: flex; gap: 16px; background: #fff; border: 1px solid var(--line); padding: 26px; box-shadow: var(--shadow-sm); }
+    .why .ic { font-size: 26px; }
+    .why h3 { font-size: 18px; margin-bottom: 6px; font-weight: 700; }
+    .why p { color: var(--muted); font-size: 15px; }
+
+    /* STATS BAND */
+    .stats { background: var(--grad); color: #fff; padding: 56px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; box-shadow: var(--shadow); }
+    .stats .s b { display: block; font-size: 46px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
+    .stats .s span { font-size: 15px; opacity: 0.92; margin-top: 8px; display: block; }
+    .stats .s + .s { border-left: 1px solid rgba(255,255,255,0.25); padding-left: 28px; }
+
+    /* DASHBOARD */
+    .dash-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .refresh { font-size: 13px; color: var(--muted); }
+    .kpis { display: flex; gap: 18px; flex-wrap: wrap; margin: 24px 0 26px; }
+    .kpi { background: #fff; border: 1px solid var(--line); padding: 20px 26px; min-width: 160px; box-shadow: var(--shadow-sm); }
+    .kpi .n { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+    .kpi .l { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .kpi.indigo .n { color: var(--indigo); }
+    .kpi.cyan .n { color: var(--cyan); }
+    .tablecard { background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow-sm); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 15px 20px; font-size: 14px; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); font-weight: 700; background: var(--soft); }
+    tr:last-child td { border-bottom: none; }
+    .tag { font-size: 11px; padding: 4px 10px; font-weight: 700; }
+    .tag.active { background: rgba(22,163,74,0.12); color: #15803d; }
+    .tag.cancelled { background: rgba(220,38,38,0.12); color: #dc2626; }
+    .tag.lead { background: rgba(79,70,229,0.12); color: var(--indigo); }
+    .empty { color: var(--muted); padding: 30px; text-align: center; }
+
+    /* CTA */
+    .cta { background: var(--grad); color: #fff; padding: 60px; display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 40px; align-items: center; box-shadow: var(--shadow); }
+    .cta h2 { font-size: 38px; letter-spacing: -1px; font-weight: 800; margin-bottom: 12px; }
+    .cta p { font-size: 18px; opacity: 0.93; max-width: 460px; }
+    .cta .btn-white { margin-top: 24px; }
+    .qrbox { background: #fff; padding: 18px; text-align: center; color: var(--ink); justify-self: end; }
+    .qrbox #qr { display: inline-block; }
+    .qrbox small { display: block; margin-top: 12px; color: var(--muted); font-size: 12px; }
+
+    footer { padding: 40px 0; border-top: 1px solid var(--line); }
+    footer .wrap { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 14px; flex-wrap: wrap; gap: 10px; }
+
+    @media (max-width: 900px) {
+      .hero .wrap { grid-template-columns: 1fr; gap: 48px; }
+      h1 { font-size: 42px; }
+      .grid3, .grid2 { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); padding: 36px; }
+      .stats .s:nth-child(odd) { border-left: none; padding-left: 0; }
+      .cta { grid-template-columns: 1fr; padding: 38px; text-align: center; }
+      .qrbox { justify-self: center; }
+      .nav .link { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="wrap">
+      <div class="logo"><span class="mark">◆</span> <span id="brand">AI Assistant</span></div>
+      <nav class="nav">
+        <a class="link" href="#how">How it works</a>
+        <a class="link" href="#why">Why us</a>
+        <a class="link" href="#dashboard">Live</a>
+        <a class="btn btn-dark" href="#try"><span class="dot"></span> Get started</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <span class="pill"><span class="live"></span> Live on WhatsApp and phone, 24/7</span>
+        <h1>Turn every message into a <span class="grad">booked appointment.</span></h1>
+        <p class="sub">An AI assistant that answers every WhatsApp and call in seconds, books the slot on your calendar, and reminds the customer to show up. No missed leads, day or night.</p>
+        <div class="hero-cta">
+          <a class="btn btn-grad" id="hero-wa" href="#" target="_blank" rel="noopener"><span class="dot"></span> Chat on WhatsApp</a>
+          <a class="btn btn-line" href="#how">See how it works</a>
+        </div>
+        <div class="hero-meta">
+          <div><b class="grad">&lt;10s</b><span>Average reply</span></div>
+          <div><b class="grad">24/7</b><span>Always answering</span></div>
+          <div><b class="grad">Zero</b><span>Leads missed</span></div>
+        </div>
+      </div>
+
+      <!-- product: a real WhatsApp booking -->
+      <div class="chat">
+        <div class="chat-head">
+          <div class="who">
+            <span class="av">◆</span>
+            <div><div class="nm" id="chat-name">Assistant</div><div class="st">online</div></div>
+          </div>
+          <span class="brand-tag">WhatsApp</span>
+        </div>
+        <div class="chat-body">
+          <div class="b them">Hi! How can I help, booking, pricing, or a question?</div>
+          <div class="b me">how much is teeth whitening?<div class="t">9:41</div></div>
+          <div class="b them">Whitening starts at $250. Want me to book you in?</div>
+          <div class="b me">yes, Sam, tomorrow 11am, cleaning<div class="t">9:41</div></div>
+          <div class="conf">
+            <div class="hd">✅ Booking confirmed</div>
+            <div class="ln">Name · Sam</div>
+            <div class="ln">When · Tomorrow, 11:00 AM</div>
+            <div class="ln">Reason · Cleaning</div>
+          </div>
+          <div class="b them">All set, see you then!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRUST -->
+  <div class="trust">
+    <div class="wrap">
+      <span class="lbl">Works with the tools you already use</span>
+      <span class="it"><span class="ic">💬</span> WhatsApp</span>
+      <span class="it"><span class="ic">📞</span> Phone calls</span>
+      <span class="it"><span class="ic">🗓️</span> Google Calendar</span>
+    </div>
+  </div>
+
+  <!-- HOW -->
+  <section class="block" id="how">
+    <div class="wrap">
+      <div class="head center">
+        <span class="eyebrow">How it works</span>
+        <h2>From first message to a confirmed booking</h2>
+        <p>Every step runs automatically. You only see the results.</p>
+      </div>
+      <div class="grid3">
+        <div class="card"><span class="step">01</span><div class="ic">💬</div><h3>Customer reaches out</h3><p>A WhatsApp message or a call. No app, no form, no hold music.</p></div>
+        <div class="card"><span class="step">02</span><div class="ic">🧠</div><h3>The AI understands</h3><p>It replies in seconds using your real hours, services, and prices.</p></div>
+        <div class="card"><span class="step">03</span><div class="ic">🗓️</div><h3>It books the slot</h3><p>It checks opening hours, refuses closed times, and adds it to your calendar.</p></div>
+        <div class="card"><span class="step">04</span><div class="ic">✅</div><h3>Instant confirmation</h3><p>A WhatsApp confirmation with the exact time, even when they booked by phone.</p></div>
+        <div class="card"><span class="step">05</span><div class="ic">⏰</div><h3>Reminder before the visit</h3><p>A nudge the day before, which cuts no-shows and protects revenue.</p></div>
+        <div class="card"><span class="step">06</span><div class="ic">🔄</div><h3>Reschedule by reply</h3><p>Customers reply to change or cancel. The same booking updates, no duplicates.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="block">
+    <div class="wrap">
+      <div class="stats">
+        <div class="s"><b>24/7</b><span>Answering, every day</span></div>
+        <div class="s"><b>&lt;10s</b><span>Average response time</span></div>
+        <div class="s"><b>2</b><span>Channels, one assistant</span></div>
+        <div class="s"><b>1 day</b><span>Reminder before each visit</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="block alt" id="why">
+    <div class="wrap">
+      <div class="head center">
+        <span class="eyebrow">Why it's different</span>
+        <h2>Not a chatbot. It finishes the job.</h2>
+        <p>Most bots only talk. This one completes real actions on real systems.</p>
+      </div>
+      <div class="grid2">
+        <div class="why"><div class="ic">🔗</div><div><h3>One brain, two channels</h3><p>A call can follow up by text, with full memory of the conversation across WhatsApp and phone.</p></div></div>
+        <div class="why"><div class="ic">🎯</div><div><h3>Real actions, not just chat</h3><p>It books, reschedules, and cancels on a real calendar. The booking is the result, not the chat.</p></div></div>
+        <div class="why"><div class="ic">🛡️</div><div><h3>It knows the rules</h3><p>It only books inside opening hours, and never invents prices or policies it was not given.</p></div></div>
+        <div class="why"><div class="ic">🕓</div><div><h3>Always on</h3><p>Nights, weekends, and lunch breaks are covered. Leads stop slipping through after hours.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="block" id="dashboard">
+    <div class="wrap">
+      <div class="dash-top">
+        <div class="head">
+          <span class="eyebrow">Live</span>
+          <h2>Bookings and leads, in real time</h2>
+        </div>
+        <span class="refresh">Auto-updates every 8s</span>
+      </div>
+      <div class="kpis">
+        <div class="kpi indigo"><div class="n" id="s-active">0</div><div class="l">Active bookings</div></div>
+        <div class="kpi cyan"><div class="n" id="s-leads">0</div><div class="l">Leads captured</div></div>
+        <div class="kpi"><div class="n" id="s-total">0</div><div class="l">Total interactions</div></div>
+      </div>
+      <div class="tablecard">
+        <table>
+          <thead><tr><th>Status</th><th>Name</th><th>When</th><th>Reason / Interest</th><th>Channel</th></tr></thead>
+          <tbody id="rows"><tr><td colspan="5" class="empty">No bookings yet. Send the assistant a WhatsApp message to see one appear here.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="block" id="try">
+    <div class="wrap">
+      <div class="cta">
+        <div>
+          <h2>Try the assistant right now</h2>
+          <p>Message it on WhatsApp, book a test appointment, and watch it appear on the live dashboard above.</p>
+          <a class="btn btn-white" id="cta-wa" href="#" target="_blank" rel="noopener"><span class="dot"></span> Chat on WhatsApp</a>
+        </div>
+        <div class="qrbox">
+          <div id="qr"></div>
+          <small id="qr-note">Scan to start a chat</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span id="foot-name">AI Assistant</span>
+      <span>Live on WhatsApp and phone</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script>
+    let info = {};
+    function waLink() {
+      const text = info.sandboxJoinCode ? "join " + info.sandboxJoinCode : "Hi, I'd like to book an appointment";
+      return "https://wa.me/" + info.whatsappNumber + "?text=" + encodeURIComponent(text);
+    }
+    function fmt(iso) {
+      if (!iso) return "-";
+      try {
+        const [d, t] = iso.replace(/(Z|[+-]\d{2}:\d{2})$/, "").split("T");
+        const [y, mo, day] = d.split("-").map(Number);
+        const [h, mi] = (t || "00:00").split(":").map(Number);
+        const date = new Date(Date.UTC(y, mo - 1, day, h, mi || 0));
+        return date.toLocaleString("en-US", { timeZone: "UTC", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+      } catch { return iso; }
+    }
+    function mask(c) { const s = String(c || ""); return s.length > 4 ? s.slice(0,3) + "•••" + s.slice(-3) : s; }
+    async function loadInfo() {
+      info = await (await fetch("/api/info")).json();
+      document.title = info.name + " | AI Assistant";
+      document.getElementById("brand").textContent = info.name;
+      document.getElementById("foot-name").textContent = info.name;
+      document.getElementById("chat-name").textContent = info.assistantName || info.name;
+      const link = waLink();
+      document.getElementById("hero-wa").href = link;
+      document.getElementById("cta-wa").href = link;
+      new QRCode(document.getElementById("qr"), { text: link, width: 150, height: 150, correctLevel: QRCode.CorrectLevel.M });
+      document.getElementById("qr-note").textContent = info.sandboxJoinCode ? "Sandbox: scanning sends the join code first" : "Scan to start a chat";
+    }
+    async function loadLeads() {
+      let data = [];
+      try { data = await (await fetch("/api/leads")).json(); } catch { return; }
+      const bookings = data.filter(d => d.type === "book_appointment");
+      const leads = data.filter(d => d.type === "capture_lead");
+      const active = bookings.filter(b => b.status !== "cancelled");
+      document.getElementById("s-active").textContent = active.length;
+      document.getElementById("s-leads").textContent = leads.length;
+      document.getElementById("s-total").textContent = data.length;
+      const recent = [...data].reverse().slice(0, 12);
+      if (!recent.length) return;
+      document.getElementById("rows").innerHTML = recent.map(r => {
+        const isLead = r.type === "capture_lead";
+        const status = isLead ? "lead" : (r.status === "cancelled" ? "cancelled" : "active");
+        const label = isLead ? "Lead" : (r.status === "cancelled" ? "Cancelled" : "Booked");
+        return `<tr><td><span class="tag ${status}">${label}</span></td><td>${r.name || "-"}</td><td>${isLead ? "-" : fmt(r.start_iso)}</td><td>${r.reason || r.interest || "-"}</td><td>${(r.channel || "-")} · ${mask(r.contact)}</td></tr>`;
+      }).join("");
+    }
+    loadInfo();
+    loadLeads();
+    setInterval(loadLeads, 8000);
+  </script>
+</body>
+</html>
