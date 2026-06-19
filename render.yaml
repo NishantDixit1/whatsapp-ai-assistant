@@ -1,0 +1,31 @@
+# Render Blueprint. When you create a "Blueprint" service on Render and point it
+# at this repo, it reads this file and sets everything up automatically.
+# Secret values (sync: false) are NOT stored here. Render will prompt you to
+# enter them in its dashboard, so your keys never end up in the public repo.
+services:
+  - type: web
+    name: whatsapp-ai-assistant
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      # --- Secrets: you enter these in the Render dashboard ---
+      - key: GROQ_API_KEY
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+
+      # --- Non-secret config: edit here as needed ---
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: TWILIO_WHATSAPP_FROM
+        value: whatsapp:+14155238886
+      - key: BUSINESS_TIMEZONE
+        value: America/Chicago
+      - key: REMINDER_HOURS_BEFORE
+        value: "24"
+      - key: REMINDER_INTERVAL_MIN
+        value: "15"
